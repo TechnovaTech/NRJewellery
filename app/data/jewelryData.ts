@@ -3,7 +3,7 @@ export interface JewelryItem {
   name: string
   price: string
   priceValue: number
-  category: 'pendant' | 'combo' | 'chain' | 'necklace' | 'bangles' | 'earrings'
+  category: 'combo' | 'necklace' | 'bangles' | 'earrings'
   subcategory: 'daily' | 'office' | 'party' | 'bridal' | 'casual'
   material: 'gold' | 'silver' | 'diamond' | 'pearl' | 'rose-gold' | 'platinum'
   color: 'gold' | 'silver' | 'white' | 'rose-gold' | 'black' | 'multicolor'
@@ -17,14 +17,6 @@ export interface JewelryItem {
 export const jewelryCategories = [
   {
     id: 1,
-    name: 'PENDANTS',
-    slug: 'pendant',
-    image: 'https://nemichandjewels.com/cdn/shop/files/8500413.jpg$v=1697199154&width=1946',
-    description: 'Elegant pendants for every occasion',
-    count: 8
-  },
-  {
-    id: 2,
     name: 'COMBO',
     slug: 'combo',
     image: 'https://tejaani.com/wp-content/uploads/2021/03/BRCJ7-1.jpg',
@@ -32,15 +24,7 @@ export const jewelryCategories = [
     count: 12
   },
   {
-    id: 3,
-    name: 'CHAINS',
-    slug: 'chain',
-    image: 'https://www.elyta.in/cdn/shop/files/CH00763R16.jpg$v=1723274936',
-    description: 'Classic and modern chain designs',
-    count: 6
-  },
-  {
-    id: 4,
+    id: 2,
     name: 'NECKLACES',
     slug: 'necklace',
     image: 'https://adn-static1.nykaa.com/nykdesignstudio-images/pub/media/catalog/product/5/f/5f2a02d11015438_3.jpg$rnd=20200526195200&tr=w-512',
@@ -48,7 +32,7 @@ export const jewelryCategories = [
     count: 10
   },
   {
-    id: 5,
+    id: 3,
     name: 'BANGLES',
     slug: 'bangles',
     image: 'https://shop.globein.com/cdn/shop/products/p415335_2c_1080x.jpg$v=1755645780',
@@ -56,7 +40,7 @@ export const jewelryCategories = [
     count: 8
   },
   {
-    id: 6,
+    id: 4,
     name: 'EARRINGS',
     slug: 'earrings',
     image: 'https://www.miabytanishq.com/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dw7b2c8259/images/hi-res/3023SCJ.jpg',
@@ -66,128 +50,6 @@ export const jewelryCategories = [
 ]
 
 export const jewelryItems: JewelryItem[] = [
-  // PENDANTS (8 items)
-  {
-    id: 1,
-    name: 'Diamond Solitaire Pendant',
-    price: '$299',
-    priceValue: 299,
-    category: 'pendant',
-    subcategory: 'daily',
-    material: 'diamond',
-    color: 'white',
-    image: 'https://nemichandjewels.com/cdn/shop/files/8500413.jpg$v=1697199154&width=1946',
-    description: 'Classic diamond solitaire pendant perfect for everyday elegance',
-    inStock: true,
-    rating: 4.8,
-    reviews: 124
-  },
-  {
-    id: 2,
-    name: 'Heart Shaped Gold Pendant',
-    price: '$199',
-    priceValue: 199,
-    category: 'pendant',
-    subcategory: 'casual',
-    material: 'gold',
-    color: 'gold',
-    image: 'https://i.etsystatic.com/25121843/r/il/a1b57b/4558955068/il_570xN.4558955068_mrxo.jpg',
-    description: 'Romantic heart-shaped pendant in 14k gold',
-    inStock: true,
-    rating: 4.6,
-    reviews: 89
-  },
-  {
-    id: 3,
-    name: 'Pearl Drop Pendant',
-    price: '$159',
-    priceValue: 159,
-    category: 'pendant',
-    subcategory: 'office',
-    material: 'pearl',
-    color: 'white',
-    image: 'https://cdn.faire.com/fastly/0774eda7dd5238ae20edba2b029d00620beb2ac3891ef195f1518698e599d8e4.jpeg$bg-color=FFFFFF&canvas=720:720&dpr=1&fit=bounds&format=jpg&height=720&width=720',
-    description: 'Elegant pearl drop pendant for professional wear',
-    inStock: true,
-    rating: 4.7,
-    reviews: 67
-  },
-  {
-    id: 4,
-    name: 'Ruby Statement Pendant',
-    price: '$899',
-    priceValue: 899,
-    category: 'pendant',
-    subcategory: 'party',
-    material: 'diamond',
-    color: 'multicolor',
-    image: 'https://img.tatacliq.com/images/i22//437Wx649H/MP000000022302255_437Wx649H_202503121514441.jpeg',
-    description: 'Stunning ruby pendant with diamond accents',
-    inStock: true,
-    rating: 4.9,
-    reviews: 45
-  },
-  {
-    id: 5,
-    name: 'Vintage Locket Pendant',
-    price: '$249',
-    priceValue: 249,
-    category: 'pendant',
-    subcategory: 'casual',
-    material: 'gold',
-    color: 'gold',
-    image: 'https://i.etsystatic.com/10805627/r/il/7e9fb2/3530428993/il_570xN.3530428993_2clp.jpg',
-    description: 'Antique-style locket pendant with intricate design',
-    inStock: true,
-    rating: 4.5,
-    reviews: 78
-  },
-  {
-    id: 6,
-    name: 'Emerald Teardrop Pendant',
-    price: '$599',
-    priceValue: 599,
-    category: 'pendant',
-    subcategory: 'party',
-    material: 'diamond',
-    color: 'multicolor',
-    image: 'https://rubans.in/cdn/shop/files/rubans-rhodium-plated-emerald-green-white-cubiczirconia-studded-adjustable-cocktail-ring-finger-rings-1143859821_1800x1800.jpg$v=1755714500',
-    description: 'Luxurious emerald teardrop pendant',
-    inStock: true,
-    rating: 4.8,
-    reviews: 32
-  },
-  {
-    id: 7,
-    name: 'Cross Pendant',
-    price: '$179',
-    priceValue: 179,
-    category: 'pendant',
-    subcategory: 'daily',
-    material: 'silver',
-    color: 'silver',
-    image: 'https://i.etsystatic.com/32042581/c/1504/1195/0/623/il/45e6f6/4281568428/il_340x270.4281568428_d45v.jpg',
-    description: 'Simple sterling silver cross pendant',
-    inStock: true,
-    rating: 4.6,
-    reviews: 156
-  },
-  {
-    id: 8,
-    name: 'Bridal Diamond Pendant',
-    price: '$1299',
-    priceValue: 1299,
-    category: 'pendant',
-    subcategory: 'bridal',
-    material: 'diamond',
-    color: 'white',
-    image: 'https://shop.southindiajewels.com/wp-content/uploads/2020/05/Grand-AD-Stone-Bridal-Choker-01.jpg',
-    description: 'Exquisite diamond pendant for bridal occasions',
-    inStock: true,
-    rating: 5.0,
-    reviews: 23
-  },
-
   // COMBO (12 items)
   {
     id: 9,
@@ -368,98 +230,6 @@ export const jewelryItems: JewelryItem[] = [
     inStock: true,
     rating: 4.9,
     reviews: 78
-  },
-
-  // CHAINS (6 items)
-  {
-    id: 21,
-    name: 'Gold Cuban Chain',
-    price: '$599',
-    priceValue: 599,
-    category: 'chain',
-    subcategory: 'casual',
-    material: 'gold',
-    color: 'gold',
-    image: 'https://www.elyta.in/cdn/shop/files/CH00763R16.jpg$v=1723274936',
-    description: 'Bold 18k gold Cuban link chain',
-    inStock: true,
-    rating: 4.7,
-    reviews: 89
-  },
-  {
-    id: 22,
-    name: 'Delicate Silver Chain',
-    price: '$129',
-    priceValue: 129,
-    category: 'chain',
-    subcategory: 'daily',
-    material: 'silver',
-    color: 'silver',
-    image: 'https://i.etsystatic.com/10805627/r/il/7e9fb2/3530428993/il_570xN.3530428993_2clp.jpg',
-    description: 'Fine sterling silver chain for layering',
-    inStock: true,
-    rating: 4.6,
-    reviews: 156
-  },
-  {
-    id: 23,
-    name: 'Rose Gold Box Chain',
-    price: '$199',
-    priceValue: 199,
-    category: 'chain',
-    subcategory: 'office',
-    material: 'rose-gold',
-    color: 'rose-gold',
-    image: 'https://i.etsystatic.com/5121484/r/il/8135fa/5664368383/il_fullxfull.5664368383_mvfh.jpg',
-    description: 'Elegant rose gold box chain',
-    inStock: true,
-    rating: 4.8,
-    reviews: 67
-  },
-  {
-    id: 24,
-    name: 'Diamond Tennis Chain',
-    price: '$2999',
-    priceValue: 2999,
-    category: 'chain',
-    subcategory: 'party',
-    material: 'diamond',
-    color: 'white',
-    image: 'https://i.pinimg.com/736x/bc/d4/b0/bcd4b018e11ff8c5ade357787510311b.jpg',
-    description: 'Luxury diamond tennis chain',
-    inStock: true,
-    rating: 5.0,
-    reviews: 23
-  },
-  {
-    id: 25,
-    name: 'Rope Chain Necklace',
-    price: '$399',
-    priceValue: 399,
-    category: 'chain',
-    subcategory: 'casual',
-    material: 'gold',
-    color: 'gold',
-    image: 'https://www.allthingsaboutwedding.com/cdn/shop/files/DiamondandRoundCharmsRoseGoldMinimalChainNecklace-TheJewelbox-1.png$v=1729316490',
-    description: 'Classic gold rope chain',
-    inStock: true,
-    rating: 4.5,
-    reviews: 134
-  },
-  {
-    id: 26,
-    name: 'Platinum Link Chain',
-    price: '$1299',
-    priceValue: 1299,
-    category: 'chain',
-    subcategory: 'bridal',
-    material: 'platinum',
-    color: 'silver',
-    image: 'https://shop.kenanddanadesign.com/cdn/shop/files/Paralee-Main-WB-27083.jpg',
-    description: 'Premium platinum link chain',
-    inStock: true,
-    rating: 4.9,
-    reviews: 34
   },
 
   // NECKLACES (10 items)

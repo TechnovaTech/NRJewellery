@@ -43,10 +43,10 @@ export default function ProductDetailPage() {
   
   const getMetalWeight = () => {
     switch(product.category) {
-      case 'ring': return '3.2g'
+      case 'combo': return '3.2g'
       case 'necklace': return '8.5g'
       case 'earrings': return '2.1g'
-      case 'bracelet': return '12.3g'
+      case 'bangles': return '12.3g'
       default: return '5.0g'
     }
   }
@@ -117,7 +117,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Ring Size */}
-            {product.category === 'ring' && (
+            {product.category === 'combo' && (
               <div>
                 <h3 className="text-lg font-semibold mb-3">Ring Size</h3>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-2">
@@ -245,7 +245,7 @@ export default function ProductDetailPage() {
                   <span className="text-gray-500">Purity:</span>
                   <span className="ml-2 font-medium">18K (75% Pure)</span>
                 </div>
-                {product.category === 'ring' && (
+                {product.category === 'combo' && (
                   <>
                     <div>
                       <span className="text-gray-500">Band Width:</span>
