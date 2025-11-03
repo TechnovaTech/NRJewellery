@@ -1,94 +1,35 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles, Calendar, Mail, Phone, MapPin, MessageCircle, Instagram, Twitter, Facebook, Send } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Footer from './components/Footer'
-import TrustSection from './components/TrustSection'
 import NewArrival from './components/NewArrival'
 
-const categories = [
-  {
-    id: 1,
-    name: 'COMBO SETS',
-    image: '/ring1.webp'
-  },
-  {
-    id: 2,
-    name: 'NECKLACES',
-    image: '/nacklace1.webp'
-  },
-  {
-    id: 3,
-    name: 'EARRINGS',
-    image: '/earring1.jpeg'
-  },
-  {
-    id: 4,
-    name: 'BANGLES',
-    image: '/bracelet3.webp'
-  },
-  
-  
-]
-
 export default function HomePage() {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [scrollPosition, setScrollPosition] = useState(0)
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
   
-  // Duplicate categories for infinite loop
-  const infiniteCategories = [...categories, ...categories]
-
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      const itemWidth = scrollRef.current.clientWidth / 3
-      const newPosition = Math.max(0, scrollPosition - itemWidth)
-      scrollRef.current.scrollTo({ left: newPosition, behavior: 'smooth' })
-      setScrollPosition(newPosition)
-    }
-  }
-
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      const itemWidth = scrollRef.current.clientWidth / 3
-      const maxPosition = itemWidth * categories.length
-      let newPosition = scrollPosition + itemWidth
-      
-      if (newPosition >= maxPosition) {
-        scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' })
-        setScrollPosition(0)
-      } else {
-        scrollRef.current.scrollTo({ left: newPosition, behavior: 'smooth' })
-        setScrollPosition(newPosition)
-      }
-    }
-  }
-
+  // Fetch categories from API
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (scrollRef.current) {
-        const itemWidth = scrollRef.current.clientWidth / 3 // Show 3 items at once
-        
-        setScrollPosition(prev => {
-          const newPosition = prev + itemWidth
-          const maxPosition = itemWidth * categories.length
-          
-          // Reset to beginning when we've scrolled through original set
-          if (newPosition >= maxPosition) {
-            scrollRef.current?.scrollTo({ left: 0, behavior: 'auto' })
-            return 0
-          }
-          
-          scrollRef.current?.scrollTo({ left: newPosition, behavior: 'smooth' })
-          return newPosition
-        })
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      } finally {
+        setLoading(false)
       }
-    }, 3000)
-
-    return () => clearInterval(interval)
+    }
+    fetchCategories()
   }, [])
+  
+
 
   return (
     <div className="min-h-screen">
@@ -100,8 +41,7 @@ export default function HomePage() {
       >
         <div className="absolute inset-0">
           <Image
-          src="/hero.jpg"
-            //src="https://assets.bounceexchange.com/assets/uploads/clients/4821/creatives/6fd81332b04cace4b6bf8ae8e2810b18.jpg"
+            src="/hero.jpg"
             alt="Jewelry Background"
             fill
             className="object-cover"
@@ -109,18 +49,7 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
         </div>
-        {/* <div className="absolute inset-0">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="https://media.davidyurman.com/video/Content/2025/7-14-Amulets/Mens-Amulets/2025_Summer4_MenAmulets_Hero_Desktop.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
-        </div> */}
+
         
         <motion.div
           initial={{ x: -100, opacity: 0 }}
@@ -128,18 +57,10 @@ export default function HomePage() {
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative z-10 text-left max-w-2xl mx-8 mt-32"
         >
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="inline-block mb-6"
-          >
-            {/*<Sparkles className="text-yellow-400" size={60} /> */}
-          </motion.div>
+
           
-           <h1 className="text-3xl sm:text-4xl lg:text-5xl pt-6 font-space font-black text-white mb-6 leading-tight text-start">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl pt-6 font-space font-black text-white mb-6 leading-tight text-start">
             YOUR STORY, OUR CRAFT.
-            <br />
-            {/* <span className="text-yellow-400">JEWELRY</span> */}
           </h1>
           
           <p className="text-lg sm:text-xl lg:text-2xl text-gray-200 mb-8 font-light">
@@ -154,7 +75,6 @@ export default function HomePage() {
                 className="border-2 border-white text-white hover:bg-white hover:text-black px-8 py-4  font-bold text-lg transition-all duration-300"
               >
                 Shop Now
-                {/* <ArrowRight className="ml-2" size={20} /> */}
               </motion.button>
             </Link>
           </div>
@@ -178,34 +98,53 @@ export default function HomePage() {
             </p>
           </motion.div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {categories.map((category) => (
-              <div key={category.id} className="text-center">
-                <Link 
-                  href={`/category/${category.name.toLowerCase().replace(' ', '-')}`}
-                  className="relative aspect-square cursor-pointer group rounded-lg overflow-hidden block"
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading categories...</p>
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">💎</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">No Categories Yet</h3>
+              <p className="text-gray-600">Categories will appear here once added by admin.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+              {categories.map((category) => (
+                <motion.div 
+                  key={category._id} 
+                  className="text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <Image
-                    src={category.image}
-                    alt={category.name}
-                    fill
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                </Link>
-                <h3 className="text-lg font-medium text-gray-800 mt-3">
-                  {category.name}
-                </h3>
-              </div>
-            ))}
-          </div>
+                  <Link 
+                    href={`/category/${category.slug}`}
+                    className="relative aspect-square cursor-pointer group rounded-lg overflow-hidden block shadow-lg hover:shadow-xl transition-shadow duration-300"
+                  >
+                    <Image
+                      src={category.image || '/placeholder.svg'}
+                      alt={category.name}
+                      fill
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                  </Link>
+                  <h3 className="text-lg font-medium text-gray-800 mt-3">
+                    {category.name}
+                  </h3>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Unique Design Section */}
-      <section className="py-20 bg-white">
+      {/* <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left - Text Content */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -219,7 +158,7 @@ export default function HomePage() {
               </div>
               
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 leading-tight">
-                At NR Crafted Jewellery,
+                At Nove Crafted Jewellery,
                 <span className="block text-gray-600 text-2xl sm:text-3xl mt-2">what kind of life will this belong to?</span>
               </h2>
               
@@ -253,8 +192,6 @@ export default function HomePage() {
                 </Link>
               </div>
             </motion.div>
-            
-            {/* Right - Image */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -276,15 +213,13 @@ export default function HomePage() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <NewArrival />
-      <TrustSection />
-
-
+      {/* <TrustSection /> */}
 
       {/* Customer Reviews Section */}
-      <section className="py-17 pb-10 bg-white relative overflow-hidden">
+       <section className="py-17 pb-10 bg-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-gray-100/30 via-white to-gray-100/30"></div>
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <motion.div
@@ -359,8 +294,9 @@ export default function HomePage() {
                   image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face",
                   verified: true
                 }
-              ].concat([
-                {
+              ]
+              .concat([
+                { 
                   name: "Sarah Johnson",
                   location: "New York, NY",
                   rating: 5,
@@ -438,7 +374,6 @@ export default function HomePage() {
               ))}
             </motion.div>
           </div>
-          
         </div>
       </section>
       <Footer />      

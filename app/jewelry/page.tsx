@@ -10,43 +10,89 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
-import { jewelryItems, jewelryCategories, subcategories, materials, colors, sortOptions, priceRanges } from '../data/jewelryData'
+
+interface Product {
+  _id: string
+  name: string
+  description: string
+  price: number
+  category: {
+    _id: string
+    name: string
+  }
+  images: string[]
+  inStock: boolean
+  featured: boolean
+  stock: number
+}
+
+const priceRanges = [
+  { label: 'All Prices', min: 0, max: 100000 },
+  { label: 'Under ₹5000', min: 0, max: 5000 },
+  { label: '₹5000 - ₹15000', min: 5000, max: 15000 },
+  { label: '₹15000 - ₹30000', min: 15000, max: 30000 },
+  { label: '₹30000 - ₹50000', min: 30000, max: 50000 },
+  { label: 'Over ₹50000', min: 50000, max: 100000 }
+]
 
 export default function JewelryPage() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [sortBy, setSortBy] = useState('newest')
-  const [showFilters, setShowFilters] = useState(false)
-  const [selectedType, setSelectedType] = useState('all')
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(['all'])
-  const [selectedColor, setSelectedColor] = useState('all')
-  const [selectedSubcategory, setSelectedSubcategory] = useState('all')
   const [selectedPriceRange, setSelectedPriceRange] = useState(priceRanges[0])
+  const [sortBy, setSortBy] = useState('newest')
   const { addToCart } = useCart()
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { requireAuth } = useAuth()
   const router = useRouter()
 
-  const filteredItems = jewelryItems.filter(item => {
-    const categoryMatch = selectedCategory === 'all' || item.category === selectedCategory
-    const typeMatch = selectedType === 'all' || item.category === selectedType
-    const materialMatch = selectedMaterials.includes('all') || selectedMaterials.includes(item.material)
-    const colorMatch = selectedColor === 'all' || item.color === selectedColor
-    const subcategoryMatch = selectedSubcategory === 'all' || item.subcategory === selectedSubcategory
-    const priceMatch = item.priceValue >= selectedPriceRange.min && item.priceValue <= selectedPriceRange.max
+  useEffect(() => {
+    fetchProducts()
+    fetchCategories()
+  }, [])
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products')
+      if (response.ok) {
+        const data = await response.json()
+        setProducts(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error)
+    }
+  }
+
+  const filteredItems = products.filter(item => {
+    const categoryMatch = selectedCategory === 'all' || item.category.name.toLowerCase() === selectedCategory.toLowerCase()
+    const priceMatch = item.price >= selectedPriceRange.min && item.price <= selectedPriceRange.max
     
-    return categoryMatch && typeMatch && materialMatch && colorMatch && subcategoryMatch && priceMatch
+    return categoryMatch && priceMatch
   }).sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
-        return a.priceValue - b.priceValue
+        return a.price - b.price
       case 'price-high':
-        return b.priceValue - a.priceValue
-      case 'popular':
-        return b.reviews - a.reviews
-      case 'rating':
-        return b.rating - a.rating
+        return b.price - a.price
+      case 'featured':
+        return b.featured ? 1 : -1
       default:
-        return a.id - b.id
+        return 0
     }
   })
 
@@ -73,54 +119,21 @@ export default function JewelryPage() {
           >
             All Jewelry
           </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setSelectedCategory('combo')}
-            className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-              selectedCategory === 'combo'
-                ? 'bg-gray-800 text-white shadow-lg'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-            }`}
-          >
-            Combo
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setSelectedCategory('necklace')}
-            className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-              selectedCategory === 'necklace'
-                ? 'bg-gray-800 text-white shadow-lg'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-            }`}
-          >
-            Necklaces
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setSelectedCategory('earrings')}
-            className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-              selectedCategory === 'earrings'
-                ? 'bg-gray-800 text-white shadow-lg'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-            }`}
-          >
-            Earrings
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setSelectedCategory('bangles')}
-            className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-              selectedCategory === 'bangles'
-                ? 'bg-gray-800 text-white shadow-lg'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-            }`}
-          >
-            Bangles
-          </motion.button>
+          {categories.map((category) => (
+            <motion.button
+              key={category._id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSelectedCategory(category.name)}
+              className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
+                selectedCategory === category.name
+                  ? 'bg-gray-800 text-white shadow-lg'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
+              }`}
+            >
+              {category.name}
+            </motion.button>
+          ))}
         </div>
       </div>
 
@@ -133,37 +146,6 @@ export default function JewelryPage() {
         >
           <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-300 lg:sticky lg:top-24">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Filters</h2>
-            
-            {/* Material */}
-            <div className="mb-6">
-              <h3 className="font-bold text-gray-800 mb-3">Material</h3>
-              <div className="space-y-2">
-                {materials.map((material) => (
-                  <label key={material} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedMaterials.includes(material)}
-                      onChange={(e) => {
-                        if (material === 'all') {
-                          setSelectedMaterials(['all'])
-                        } else {
-                          if (e.target.checked) {
-                            setSelectedMaterials(prev => prev.filter(m => m !== 'all').concat(material))
-                          } else {
-                            const newMaterials = selectedMaterials.filter(m => m !== material)
-                            setSelectedMaterials(newMaterials.length === 0 ? ['all'] : newMaterials)
-                          }
-                        }
-                      }}
-                      className="w-4 h-4 text-gray-800 bg-white border-gray-300 rounded focus:ring-gray-800 focus:ring-2"
-                    />
-                    <span className="text-sm text-gray-600">
-                      {material.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
 
             {/* Price Range */}
             <div className="mb-6">
@@ -191,10 +173,6 @@ export default function JewelryPage() {
               whileHover={{ scale: 1.02 }}
               onClick={() => {
                 setSelectedCategory('all')
-                setSelectedType('all')
-                setSelectedMaterials(['all'])
-                setSelectedColor('all')
-                setSelectedSubcategory('all')
                 setSelectedPriceRange(priceRanges[0])
                 setSortBy('newest')
               }}
@@ -221,8 +199,7 @@ export default function JewelryPage() {
                 className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
               >
                 <option value="newest">Newest</option>
-                <option value="popular">Popular</option>
-                <option value="rating">Best Seller</option>
+                <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
               </select>
@@ -230,7 +207,12 @@ export default function JewelryPage() {
           </div>
 
           {/* Jewelry Grid */}
-          {filteredItems.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading products...</p>
+            </div>
+          ) : filteredItems.length === 0 ? (
             <div className="text-center py-16">
               <div className="bg-white rounded-lg p-12 shadow-sm border border-gray-300 max-w-md mx-auto">
                 <div className="text-6xl mb-4">💎</div>
@@ -244,99 +226,86 @@ export default function JewelryPage() {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-8"
             >
             {filteredItems.map((item, index) => (
-            <Link href={`/product/${item.id}`} key={item.id}>
+            <Link href={`/product/${item._id}`} key={item._id}>
               <motion.div
                 layout
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                whileHover={{ y: -4 }}
-                className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer group border border-gray-200 hover:border-gray-400"
+                whileHover={{ y: -2 }}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border border-gray-200"
               >
-              {/* Image Container */}
-              <div className="relative aspect-square overflow-hidden rounded-t-3xl">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                
-                {/* Wishlist Button */}
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    if (isInWishlist(item.id)) {
-                      removeFromWishlist(item.id)
-                    } else {
-                      addToWishlist({
-                        id: item.id,
-                        name: item.name,
-                        price: item.price,
-                        image: item.image,
-                        category: item.category
-                      })
-                    }
-                  }}
-                  className={`absolute top-4 right-4 p-2 rounded-full transition-all shadow-lg backdrop-blur-sm ${
-                    isInWishlist(item.id) 
-                      ? 'bg-gray-800 text-white' 
-                      : 'bg-white/90 text-gray-600 hover:bg-gray-800 hover:text-white'
-                  }`}
-                >
-                  <Heart className={isInWishlist(item.id) ? 'fill-current' : ''} size={18} />
-                </motion.button>
-                
-                {/* Category Badge */}
-                <div className="absolute top-4 left-4">
-                  <span className="bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg backdrop-blur-sm">
-                    {item.category}
-                  </span>
+                {/* Image */}
+                <div className="relative aspect-square overflow-hidden">
+                  <Image
+                    src={item.images[0] || '/placeholder.svg'}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                  {/* Wishlist Button */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      if (isInWishlist(item._id)) {
+                        removeFromWishlist(item._id)
+                      } else {
+                        addToWishlist({
+                          id: item._id,
+                          name: item.name,
+                          price: `₹${item.price}`,
+                          image: item.images[0],
+                          category: item.category.name
+                        })
+                      }
+                    }}
+                    className={`absolute top-3 right-3 p-2 rounded-full ${
+                      isInWishlist(item._id) 
+                        ? 'bg-red-500 text-white' 
+                        : 'bg-white text-gray-600 hover:bg-red-500 hover:text-white'
+                    } transition-colors`}
+                  >
+                    <Heart className={isInWishlist(item._id) ? 'fill-current' : ''} size={16} />
+                  </button>
                 </div>
                 
-                {/* Rating */}
-                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full flex items-center space-x-1 shadow-lg border border-gray-300">
-                  <Star className="text-gray-800 fill-current" size={14} />
-                  <span className="text-sm font-semibold text-gray-600">{item.rating}</span>
-                </div>
-              </div>
-              
-              {/* Product Info */}
-              <div className="p-6">
-                <div className="mb-4">
-                  <h3 className="font-bold text-gray-800 text-lg mb-2 line-clamp-1">
-                    {item.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm line-clamp-2">
-                    {item.description}
-                  </p>
-                </div>
-                
-                {/* Tags */}
-                <div className="flex gap-2 mb-4">
-                  <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium border border-gray-300">
-                    {item.material.replace('-', ' ')}
-                  </span>
-                  <span className="px-3 py-1 bg-gray-200 text-gray-600 text-xs rounded-full font-medium">
-                    {item.subcategory}
-                  </span>
-                </div>
-                
-                {/* Price and Rating */}
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl font-bold text-gray-800">
-                    {item.price}
-                  </span>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Star className="text-gray-800 fill-current mr-1" size={16} />
-                    <span className="font-semibold">{item.rating} ({item.reviews})</span>
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
+                  <p className="text-sm text-gray-600 mb-2">{item.category.name}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold" style={{color: '#C6A664'}}>₹{item.price}</span>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      (item.stock || 0) > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {(item.stock || 0) > 0 ? `${item.stock} in stock` : 'Out of Stock'}
+                    </span>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      if (!requireAuth()) {
+                        router.push('/login')
+                        return
+                      }
+                      addToCart({
+                        id: item._id,
+                        name: item.name,
+                        price: `₹${item.price}`,
+                        image: item.images[0],
+                        category: item.category.name
+                      })
+                    }}
+                    className="w-full mt-3 py-2 text-white rounded-lg font-medium transition-colors"
+                    style={{backgroundColor: '#C6A664'}}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#B8965A'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#C6A664'}
+                  >
+                    Add to Cart
+                  </button>
                 </div>
-
-              </div>
               </motion.div>
             </Link>
             ))}

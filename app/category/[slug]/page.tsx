@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Heart, Star, ChevronDown, ChevronUp } from 'lucide-react'
 import Image from 'next/image'
@@ -8,16 +8,17 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCart } from '../../context/CartContext'
 import { useWishlist } from '../../context/WishlistContext'
-import { jewelryItems, jewelryCategories, materials, priceRanges, sortOptions } from '../../data/jewelryData'
 import Footer from '../../components/Footer'
 
-const categoryMapping: { [key: string]: string } = {
-  'rings': 'ring',
-  'necklaces': 'necklace', 
-  'earrings': 'earrings',
-  'bracelets': 'bracelet',
-  'pendent': 'pendant'
-}
+// Static data for filters
+const materials = ['all', 'gold', 'silver', 'platinum', 'diamond', 'pearl']
+const priceRanges = [
+  { label: 'All Prices', min: 0, max: Infinity },
+  { label: 'Under ₹10,000', min: 0, max: 10000 },
+  { label: '₹10,000 - ₹25,000', min: 10000, max: 25000 },
+  { label: '₹25,000 - ₹50,000', min: 25000, max: 50000 },
+  { label: 'Above ₹50,000', min: 50000, max: Infinity }
+]
 
 export default function CategoryPage() {
   const params = useParams()
@@ -25,41 +26,79 @@ export default function CategoryPage() {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const slug = params.slug as string
   
+  // State for API data
+  const [categories, setCategories] = useState<any[]>([])
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  
   // Filter states
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>(['all'])
   const [selectedPriceRange, setSelectedPriceRange] = useState(priceRanges[0])
   const [sortBy, setSortBy] = useState('newest')
 
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoriesRes, productsRes] = await Promise.all([
+          fetch('/api/categories'),
+          fetch('/api/products')
+        ])
+        
+        const categoriesData = await categoriesRes.json()
+        const productsData = await productsRes.json()
+        
+        setCategories(categoriesData)
+        setProducts(productsData)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchData()
+  }, [])
   
-  // Map slug to category
-  const categoryType = categoryMapping[slug]
-  const categoryInfo = jewelryCategories.find(cat => cat.slug === categoryType)
+  // Find current category
+  const currentCategory = categories.find(cat => cat.slug === slug)
   
-
-  
-  // Filter and sort items
-  const filteredItems = jewelryItems.filter(item => {
-    const categoryMatch = item.category === categoryType
-    const materialMatch = selectedMaterials.includes('all') || selectedMaterials.includes(item.material)
-    const priceMatch = item.priceValue >= selectedPriceRange.min && item.priceValue <= selectedPriceRange.max
+  // Filter and sort products
+  const filteredItems = products.filter(product => {
+    if (!currentCategory) return false
+    
+    const categoryMatch = product.category._id === currentCategory._id
+    const materialMatch = selectedMaterials.includes('all') // For now, just show all materials
+    const priceMatch = product.price >= selectedPriceRange.min && product.price <= selectedPriceRange.max
     
     return categoryMatch && materialMatch && priceMatch
   }).sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
-        return a.priceValue - b.priceValue
+        return a.price - b.price
       case 'price-high':
-        return b.priceValue - a.priceValue
+        return b.price - a.price
       case 'popular':
-        return b.reviews - a.reviews
+        return 0 // No popularity data yet
       case 'rating':
-        return b.rating - a.rating
+        return 0 // No rating data yet
       default:
-        return a.id - b.id
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     }
   })
   
-  if (!categoryInfo) {
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!currentCategory) {
     return (
       <div className="min-h-screen pt-20 bg-white flex items-center justify-center">
         <div className="text-center">
@@ -104,58 +143,21 @@ export default function CategoryPage() {
               All Jewelry
             </motion.button>
           </Link>
-          <Link href='/category/rings'>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-                categoryType === 'ring'
-                  ? 'bg-gray-800 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-              }`}
-            >
-              Rings
-            </motion.button>
-          </Link>
-          <Link href='/category/necklaces'>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-                categoryType === 'necklace'
-                  ? 'bg-gray-800 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-              }`}
-            >
-              Necklaces
-            </motion.button>
-          </Link>
-          <Link href='/category/earrings'>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-                categoryType === 'earrings'
-                  ? 'bg-gray-800 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-              }`}
-            >
-              Earrings
-            </motion.button>
-          </Link>
-          <Link href='/category/bracelets'>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
-                categoryType === 'bracelet'
-                  ? 'bg-gray-800 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
-              }`}
-            >
-              Bracelets
-            </motion.button>
-          </Link>
+          {categories.map((category) => (
+            <Link key={category._id} href={`/category/${category.slug}`}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide transition-all ${
+                  category.slug === slug
+                    ? 'bg-gray-800 text-white shadow-lg'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
+                }`}
+              >
+                {category.name}
+              </motion.button>
+            </Link>
+          ))}
         </div>
       </div>
 
@@ -275,7 +277,7 @@ export default function CategoryPage() {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
             >
             {filteredItems.map((item, index) => (
-            <Link href={`/product/${item.id}`} key={item.id}>
+            <Link href={`/product/${item._id}`} key={item._id}>
               <motion.div
                 layout
                 initial={{ opacity: 0, y: 30 }}
@@ -287,7 +289,7 @@ export default function CategoryPage() {
               {/* Image Container */}
               <div className="relative aspect-square overflow-hidden rounded-t-3xl">
                 <Image
-                  src={item.image}
+                  src={item.images[0] || '/placeholder.svg'}
                   alt={item.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -300,39 +302,45 @@ export default function CategoryPage() {
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    if (isInWishlist(item.id)) {
-                      removeFromWishlist(item.id)
+                    if (isInWishlist(item._id)) {
+                      removeFromWishlist(item._id)
                     } else {
                       addToWishlist({
-                        id: item.id,
+                        id: item._id,
                         name: item.name,
-                        price: item.price,
-                        image: item.image,
-                        category: item.category
+                        price: `₹${item.price}`,
+                        image: item.images[0],
+                        category: item.category.name
                       })
                     }
                   }}
                   className={`absolute top-4 right-4 p-2 rounded-full transition-all shadow-lg backdrop-blur-sm ${
-                    isInWishlist(item.id) 
+                    isInWishlist(item._id) 
                       ? 'bg-gray-800 text-white' 
                       : 'bg-white/90 text-gray-600 hover:bg-gray-800 hover:text-white'
                   }`}
                 >
-                  <Heart className={isInWishlist(item.id) ? 'fill-current' : ''} size={18} />
+                  <Heart className={isInWishlist(item._id) ? 'fill-current' : ''} size={18} />
                 </motion.button>
                 
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4">
                   <span className="bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg backdrop-blur-sm">
-                    {item.category}
+                    {item.category.name}
                   </span>
                 </div>
                 
-                {/* Rating */}
-                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full flex items-center space-x-1 shadow-lg border border-gray-300">
-                  <Star className="text-gray-800 fill-current" size={14} />
-                  <span className="text-sm font-semibold text-gray-600">{item.rating}</span>
-                </div>
+                {/* Stock Status */}
+                {item.inStock && (
+                  <div className="absolute bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                    In Stock
+                  </div>
+                )}
+                {item.featured && (
+                  <div className="absolute bottom-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                    Featured
+                  </div>
+                )}
               </div>
               
               {/* Product Info */}
@@ -346,25 +354,14 @@ export default function CategoryPage() {
                   </p>
                 </div>
                 
-                {/* Tags */}
-                <div className="flex gap-2 mb-4">
-                  <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium border border-gray-300">
-                    {item.material.replace('-', ' ')}
-                  </span>
-                  <span className="px-3 py-1 bg-gray-200 text-gray-600 text-xs rounded-full font-medium">
-                    {item.subcategory}
-                  </span>
-                </div>
-                
-                {/* Price and Rating */}
+                {/* Price */}
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl font-bold text-gray-800">
-                    {item.price}
+                    ₹{item.price.toLocaleString()}
                   </span>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Star className="text-gray-800 fill-current mr-1" size={16} />
-                    <span className="font-semibold">{item.rating} ({item.reviews})</span>
-                  </div>
+                  {!item.inStock && (
+                    <span className="text-red-500 text-sm font-medium">Out of Stock</span>
+                  )}
                 </div>
               </div>
               </motion.div>

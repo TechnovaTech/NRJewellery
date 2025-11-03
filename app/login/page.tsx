@@ -1,98 +1,196 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
-import { useAuth } from '../context/AuthContext'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { login } = useAuth()
+  const [isLogin, setIsLogin] = useState(true)
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    phone: ''
+  })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const router = useRouter()
+  const { login, register, isLoggedIn } = useAuth()
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/')
+    }
+  }, [isLoggedIn, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    
-    const success = await login(email, password)
-    if (success) {
-      router.back()
+    setLoading(true)
+    setError('')
+
+    try {
+      // Check if it's admin credentials
+      const isAdminLogin = formData.email === 'admin@nrjewelry.com' && isLogin
+      
+      if (isAdminLogin) {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        
+        if (response.ok) {
+          router.push('/admin/dashboard')
+        } else {
+          const data = await response.json()
+          setError(data.error || 'Authentication failed')
+        }
+      } else {
+        let result
+        if (isLogin) {
+          result = await login(formData.email, formData.password)
+        } else {
+          result = await register(formData.name, formData.email, formData.password, formData.phone)
+        }
+        
+        if (result.success) {
+          router.push('/')
+        } else {
+          setError(result.message || 'Authentication failed')
+        }
+      }
+    } catch (error) {
+      setError('Authentication failed')
+    } finally {
+      setLoading(false)
     }
-    setIsLoading(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-yellow-100 to-orange-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-yellow-200/50 w-full max-w-md"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8"
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Sign in to your account</p>
+          <Link href="/" className="text-2xl font-bold text-gray-800">
+            NR Jewelry
+          </Link>
+          <p className="text-gray-600 mt-2">
+            {isLogin ? 'Welcome back!' : 'Create your account'}
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+        <div className="flex mb-6">
+          <button
+            onClick={() => setIsLogin(true)}
+            className={`flex-1 py-2 text-center rounded-l-lg transition-colors ${
+              isLogin ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-600'
+            }`}
+          >
+            Login
+          </button>
+          <button
+            onClick={() => setIsLogin(false)}
+            className={`flex-1 py-2 text-center rounded-r-lg transition-colors ${
+              !isLogin ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-600'
+            }`}
+          >
+            Register
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                placeholder="Enter your email"
-                required
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
+                required={!isLogin}
               />
             </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
+              required
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                placeholder="Enter your password"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
+              required
+            />
           </div>
+
+          {!isLogin && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
+              />
+            </div>
+          )}
+
+          {error && (
+            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+              {error}
+            </div>
+          )}
 
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-yellow-600 to-amber-600 text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50"
+            disabled={loading}
+            className="w-full bg-gray-800 text-white py-3 px-4 rounded-lg hover:bg-gray-700 disabled:opacity-50 font-medium transition-colors"
           >
-            {isLoading ? 'Signing In...' : 'Sign In'}
+            {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Create Account')}
           </motion.button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <button className="text-yellow-600 hover:text-yellow-700 font-medium">
-              Sign up
-            </button>
-          </p>
+          <Link href="/" className="text-gray-600 hover:text-gray-800 text-sm">
+            ← Back to Home
+          </Link>
         </div>
       </motion.div>
     </div>

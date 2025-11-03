@@ -22,9 +22,9 @@ export default function Preloader() {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
-      className="fixed inset-0 z-[9999] bg-gradient-to-br from-white via-gray-50 to-white flex items-center justify-center"
+      className="fixed inset-0 z-[9999] bg-bg-main flex items-center justify-center"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-100/20 via-white/30 to-gray-100/20 animate-pulse" style={{animationDuration: '3s'}} />
+      <div className="absolute inset-0 bg-gradient-to-r from-gold/10 via-gold/20 to-gold/10 animate-pulse" style={{animationDuration: '3s'}} />
       <div className="text-center relative z-10">
         <motion.div
           initial={{ opacity: 0 }}
@@ -42,9 +42,9 @@ export default function Preloader() {
           className="mb-4"
         >
           <motion.h1
-            className="text-4xl font-bold text-gray-800 uppercase tracking-wide"
+            className="text-4xl font-bold text-accent-black uppercase tracking-wide"
           >
-            {'NR CRAFTED'.split('').map((char, index) => (
+            {'FRIST NIGHT'.split('').map((char, index) => (
               <motion.span
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -59,12 +59,12 @@ export default function Preloader() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="text-4xl text-gray-600 uppercase tracking-widest mt-2"
+            className="text-4xl text-gold uppercase tracking-widest mt-2"
           >
             JEWELLERY
           </motion.p>
         </motion.div>
-        
+
         {/* <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -86,3 +86,4 @@ export default function Preloader() {
     </motion.div>
   )
 }
+

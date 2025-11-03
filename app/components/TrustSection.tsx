@@ -59,7 +59,7 @@ const TrustSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-10"
         >
-          <h2 className="text-5xl font-light text-gray-800 mb-6">Why Choose NR Crafted Jewellery</h2>
+          <h2 className="text-5xl font-light text-gray-800 mb-6">Why Choose Nove Crafted Jewellery</h2>
             <p className="text-lg text-gray-600 opacity-80">
               We're committed to providing you with the finest jewelry experience from selection to aftercare.
             </p>

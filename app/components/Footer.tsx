@@ -46,10 +46,10 @@ export default function Footer() {
               whileHover={{ scale: 1.02 }}
               className="flex items-center space-x-2 cursor-pointer"
             >
-              <Image src="/logo.png" alt="Logo" width={32} height={52} />
+              <Image src="/logo.png" alt="Logo" width={48} height={48} className="h-10 w-10" />
               <div className="flex flex-col leading-none">
                 <span className="text-lg font-bold text-gray-800 tracking-wide">
-                  NR CRAFTED
+                  FRIST NIGHT
                 </span>
                 <span className="text-sm font-medium text-gray-600 uppercase tracking-widest">
                   JEWELLERY
@@ -112,7 +112,7 @@ export default function Footer() {
         <div className="border-t border-gray-300 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 text-xs sm:text-sm mb-4 md:mb-0 text-center md:text-left">
-              © 2024 NR Crafted Jewellery. All rights reserved. <br />
+              © 2024 Nove Crafted Jewellery. All rights reserved. <br />
               Designed & Developed by <a href="https://www.technovatechnologies.com/" target="_blank" rel="noopener noreferrer" className="text-gray-800 font-bold hover:text-gray-800 transition-colors ">Technova Technologies</a>
             </p>
 

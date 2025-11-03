@@ -47,9 +47,9 @@ export default function CartPage() {
                 </Link>
               </div>
             ) : (
-              items.map((item) => (
+              items.map((item, index) => (
                 <motion.div
-                  key={item.id}
+                  key={`${item.id}-${index}`}
                   layout
                   className="bg-white backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-300"
                 >
@@ -69,9 +69,14 @@ export default function CartPage() {
                         {item.size && `Size: ${item.size}`}
                         {item.length && `Length: ${item.length}`}
                       </p>
-                      <p className="text-lg sm:text-xl font-bold text-[#D4AF37]">
-                        {typeof item.price === 'string' ? item.price : `$${(item.price as number).toLocaleString()}`}
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-sm text-[#A89F91]/70">
+                          {typeof item.price === 'string' ? item.price : `₹${(item.price as number).toLocaleString()}`} each
+                        </p>
+                        <p className="text-lg sm:text-xl font-bold text-[#D4AF37]">
+                          ₹{(parseFloat((typeof item.price === 'string' ? item.price : `${item.price}`).replace('₹', '').replace('$', '').replace(',', '')) * item.quantity).toLocaleString()}
+                        </p>
+                      </div>
                     </div>
                     
                     <div className="flex items-center justify-between sm:justify-start space-x-4 w-full sm:w-auto">
@@ -79,7 +84,11 @@ export default function CartPage() {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            console.log('Decrease clicked for item:', item.id, 'current quantity:', item.quantity)
+                            updateQuantity(item.id, Math.max(1, item.quantity - 1))
+                          }}
                           className="w-8 h-8 rounded-full bg-[#F5F2EB] flex items-center justify-center hover:bg-[#CBAE8E]/30"
                         >
                           <Minus size={16} />
@@ -90,7 +99,11 @@ export default function CartPage() {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            console.log('Increase clicked for item:', item.id, 'current quantity:', item.quantity)
+                            updateQuantity(item.id, item.quantity + 1)
+                          }}
                           className="w-8 h-8 rounded-full bg-[#F5F2EB] flex items-center justify-center hover:bg-[#CBAE8E]/30"
                         >
                           <Plus size={16} />
@@ -119,20 +132,20 @@ export default function CartPage() {
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
                 <span className="text-[#A89F91]/70">Subtotal</span>
-                <span className="font-semibold">${subtotal.toLocaleString()}</span>
+                <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#A89F91]/70">Shipping</span>
-                <span className="font-semibold">${shipping}</span>
+                <span className="font-semibold">₹{shipping}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#A89F91]/70">Tax</span>
-                <span className="font-semibold">${tax.toFixed(2)}</span>
+                <span className="font-semibold">₹{tax.toFixed(2)}</span>
               </div>
               <div className="border-t pt-4">
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total</span>
-                  <span className="text-[#D4AF37]">${total.toFixed(2)}</span>
+                  <span className="text-[#D4AF37]">₹{total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -160,7 +173,7 @@ export default function CartPage() {
             </div>
             
             <p className="text-center text-sm text-[#A89F91]/60 mt-4">
-              Free shipping on orders over $1,000
+              Free shipping on orders over ₹1,000
             </p>
           </div>
         </div>

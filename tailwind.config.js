@@ -8,13 +8,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'neon-purple': '#D4AF37',
-        'neon-teal': '#8B4513',
-        'neon-pink': '#CD853F',
-        'electric-blue': '#F5F5DC',
-        'pastel-purple': '#FFFAF0',
-        'pastel-teal': '#FDF5E6',
-        'pastel-pink': '#FAF0E6',
+        'bg-main': '#F9F9F9',
+        'text-primary': '#111111',
+        'text-secondary': '#555555',
+        'accent-black': '#000000',
+        'border-light': '#E0E0E0',
+        'gold': '#C6A664',
+        'hover-beige': '#F2E8D5',
       },
       fontFamily: {
         'poppins': ['Playfair Display', 'serif'],

@@ -1,17 +1,20 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 interface User {
   id: string
   name: string
   email: string
+  phone?: string
 }
 
 interface AuthContextType {
   user: User | null
   isLoggedIn: boolean
-  login: (email: string, password: string) => Promise<boolean>
+  loading: boolean
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>
+  register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; message?: string }>
   logout: () => void
   requireAuth: () => boolean
 }
@@ -20,22 +23,66 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Simple mock authentication
-    if (email && password) {
-      setUser({
-        id: '1',
-        name: email.split('@')[0],
-        email: email
-      })
-      return true
+  useEffect(() => {
+    // Check for existing session on mount
+    const savedUser = localStorage.getItem('user')
+    if (savedUser) {
+      setUser(JSON.parse(savedUser))
     }
-    return false
+    setLoading(false)
+  }, [])
+
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const response = await fetch('/api/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok && data.user) {
+        setUser(data.user)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        return { success: true }
+      }
+      
+      return { success: false, message: data.message || 'Login failed' }
+    } catch (error) {
+      return { success: false, message: 'Network error' }
+    }
+  }
+
+  const register = async (name: string, email: string, password: string, phone?: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const response = await fetch('/api/user/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, phone })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok && data.user) {
+        setUser(data.user)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        return { success: true }
+      }
+      
+      return { success: false, message: data.message || 'Registration failed' }
+    } catch (error) {
+      return { success: false, message: 'Network error' }
+    }
   }
 
   const logout = () => {
     setUser(null)
+    localStorage.removeItem('user')
+    localStorage.removeItem('cart')
+    localStorage.removeItem('wishlist')
   }
 
   const requireAuth = (): boolean => {
@@ -46,7 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       user,
       isLoggedIn: user !== null,
+      loading,
       login,
+      register,
       logout,
       requireAuth
     }}>

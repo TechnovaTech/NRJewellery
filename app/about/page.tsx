@@ -45,7 +45,7 @@ export default function AboutPage() {
             transition={{ delay: 0.5 }}
             className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-light text-white fw-700 mb-6 sm:mb-8 leading-tight tracking-wide"
           >
-            We are <span className="italic">NR Crafted Jewellery</span>
+            We are <span className="italic">Nove Crafted Jewellery</span>
           </motion.h1>
 
           <motion.p 
@@ -76,14 +76,14 @@ export default function AboutPage() {
             <div className="w-16 sm:w-20 lg:w-24 h-px bg-gray-800 mx-auto"></div>
           </motion.div>
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed mb-6">
-              At NR Crafted Jewellery, heritage is more than the past—it is the quiet confidence we inherit, the timeless beauty we choose, and the elegance we carry forward.
+              At Nove Crafted Jewellery, heritage is more than the past—it is the quiet confidence we inherit, the timeless beauty we choose, and the elegance we carry forward.
               Our story begins with a reverence for craftsmanship. Every diamond, every gold setting, every clasp is a testament to artistry refined through generations of jewelers who knew that true luxury is not loud—it is enduring.
               We draw inspiration from timeless elegance and modern sophistication—where beauty is lived, not displayed, and every moment is savored.
             </p>
             <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
               This spirit shapes every collection we create: classic, refined, and graceful, with a touch of contemporary allure.
               Heritage also means responsibility. Each piece is thoughtfully sourced and ethically crafted, designed to last as long as the memories it celebrates. Jewellery that begins with one generation and becomes the treasure of the next.
-              At NR Crafted Jewellery, we don’t just create ornaments for today—we craft heirlooms that carry your story into tomorrow.
+              At Nove Crafted Jewellery, we don’t just create ornaments for today—we craft heirlooms that carry your story into tomorrow.
             </p>
             
           </motion.div>
@@ -161,7 +161,7 @@ export default function AboutPage() {
             </h3>
             
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed mb-4 sm:mb-5">
-                  In a world where fine jewellery is often hidden behind inflated markups and opaque practices, NR Crafted Jewellery chooses a 
+                  In a world where fine jewellery is often hidden behind inflated markups and opaque practices, Nove Crafted Jewellery chooses a 
                   different path. We believe true luxury should be effortless and honest—rooted in integrity as much as in beauty.     
             </p>
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed mb-4 sm:mb-5">
@@ -170,7 +170,7 @@ export default function AboutPage() {
             </p>
 
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed">
-                 At NR Crafted Jewellery, we honor not just the trust of those who wear our creations today, but also the generations who 
+                 At Nove Crafted Jewellery, we honor not just the trust of those who wear our creations today, but also the generations who 
                  will inherit them tomorrow. Because jewellery is more than adornment—it is a legacy of values, memories, and timeless craft.
             </p>
           </motion.div>
@@ -245,7 +245,7 @@ export default function AboutPage() {
           >
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extralight text-gray-600 mb-4 sm:mb-6 tracking-wide">Start Your Custom Journey</h3>
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed mb-6 sm:mb-8 lg:mb-10 opacity-90">
-              A custom piece from NR Crafted Jewellery isn't just a design—it's a legacy in the making.<br className="hidden sm:block"/>
+              A custom piece from Nove Crafted Jewellery isn't just a design—it's a legacy in the making.<br className="hidden sm:block"/>
               Let's begin something unforgettable.
             </p>
             <Link href="/jewelry">
